@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { StyleSheet, Button } from 'react-native';
-
-import { Text, View } from '../components/Themed';
+import React from 'react';
+import { StyleSheet } from 'react-native';
 import { Input } from 'react-native-elements';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { Text, View } from '../components/Themed';
 import { TabActionsParamList } from '../types';
-import { useNavigation } from '@react-navigation/native';
+import { RootState, IoTCentralSettingsDispatch } from '../store';
+import { setIdScope, setDeviceId, setSymmetricKey } from '../store/iotCentralSettings/actions';
 
 type TabSettingsScreenNaviagationProp = StackNavigationProp<
   TabActionsParamList,
@@ -17,43 +19,32 @@ type Props = {
 };
 
 export default function TabSettingsScreen(props: Props) {
-  const navigation = useNavigation<>{};
-  const [idScope, setIdScope] = useState('');
-  const [deviceId, setDeviceId] = useState('');
-  const [symmetricKey, setSymmetricKey] = useState('');
-  return (
+  const selectIoTCentralSettings = (state: RootState) => state.iotCentralSettingsReducer
+  const dispatchIoTCentralSettings: IoTCentralSettingsDispatch = useDispatch()
+  
+    return (
     <View style={styles.container}>
       <Text style={styles.title}>Settings</Text>
       <Input
         label='ID scope'
         placeholder='Type ID scope'
         leftIcon={{ type: 'antdesign', name: 'bars' }}
-        onChangeText={idScope => setIdScope(idScope)}
-        defaultValue={idScope}
+        onChangeText={idScope => dispatchIoTCentralSettings(setIdScope(idScope))}
+        defaultValue={useSelector(selectIoTCentralSettings).idScope}
       />
       <Input
         label='Device ID'
         placeholder='Type Device ID'
         leftIcon={{ type: 'antdesign', name: 'bars' }}
-        onChangeText={deviceId => setDeviceId(deviceId)}
-        defaultValue={deviceId}
+        onChangeText={deviceId => dispatchIoTCentralSettings(setDeviceId(deviceId))}
+        defaultValue={useSelector(selectIoTCentralSettings).deviceId}
       />
       <Input
         label='Symmetric key'
         placeholder='Type Primary key or Secondary key'
         leftIcon={{ type: 'antdesign', name: 'key' }}
-        onChangeText={symmetricKey => setSymmetricKey(symmetricKey)}
-        defaultValue={symmetricKey}
-      />
-      <Button
-        title='Save'
-        onPress={() => {
-          props.navigation.navigate('Actions', {
-            idScope,
-            deviceId,
-            symmetricKey,
-          });
-        }}
+        onChangeText={symmetricKey => dispatchIoTCentralSettings(setSymmetricKey(symmetricKey))}
+        defaultValue={useSelector(selectIoTCentralSettings).symmetricKey}
       />
     </View>
   );
